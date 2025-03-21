@@ -1,103 +1,213 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import type React from "react"
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+import { useEffect, useRef } from "react"
+import { motion } from "motion/react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+
+interface AnimatedGradientBackgroundProps {
+    className?: string
+    children?: React.ReactNode
+    intensity?: "subtle" | "medium" | "strong"
+}
+
+interface Beam {
+    x: number
+    y: number
+    width: number
+    length: number
+    angle: number
+    speed: number
+    opacity: number
+    hue: number
+    pulse: number
+    pulseSpeed: number
+}
+
+function createBeam(width: number, height: number): Beam {
+    const angle = -35 + Math.random() * 10
+    return {
+        x: Math.random() * width * 1.5 - width * 0.25,
+        y: Math.random() * height * 1.5 - height * 0.25,
+        width: 30 + Math.random() * 60,
+        length: height * 2.5,
+        angle: angle,
+        speed: 0.6 + Math.random() * 1.2,
+        opacity: 0.12 + Math.random() * 0.16,
+        hue: 190 + Math.random() * 70,
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.02 + Math.random() * 0.03,
+    }
+}
+
+export default function LandingPage({ className, intensity = "strong" }: AnimatedGradientBackgroundProps) {
+    const canvasRef = useRef<HTMLCanvasElement>(null)
+    const beamsRef = useRef<Beam[]>([])
+    const animationFrameRef = useRef<number>(0)
+    const MINIMUM_BEAMS = 20
+
+    const opacityMap = {
+        subtle: 0.7,
+        medium: 0.85,
+        strong: 1,
+    }
+
+    useEffect(() => {
+        const canvas = canvasRef.current
+        if (!canvas) return
+
+        const ctx = canvas.getContext("2d")
+        if (!ctx) return
+
+        const updateCanvasSize = () => {
+            const dpr = window.devicePixelRatio || 1
+            canvas.width = window.innerWidth * dpr
+            canvas.height = window.innerHeight * dpr
+            canvas.style.width = `${window.innerWidth}px`
+            canvas.style.height = `${window.innerHeight}px`
+            ctx.scale(dpr, dpr)
+
+            const totalBeams = MINIMUM_BEAMS * 1.5
+            beamsRef.current = Array.from({ length: totalBeams }, () => createBeam(canvas.width, canvas.height))
+        }
+
+        updateCanvasSize()
+        window.addEventListener("resize", updateCanvasSize)
+
+        function resetBeam(beam: Beam, index: number, totalBeams: number) {
+            if (!canvas) return beam
+
+            const column = index % 3
+            const spacing = canvas.width / 3
+
+            beam.y = canvas.height + 100
+            beam.x = column * spacing + spacing / 2 + (Math.random() - 0.5) * spacing * 0.5
+            beam.width = 100 + Math.random() * 100
+            beam.speed = 0.5 + Math.random() * 0.4
+            beam.hue = 190 + (index * 70) / totalBeams
+            beam.opacity = 0.2 + Math.random() * 0.1
+            return beam
+        }
+
+        function drawBeam(ctx: CanvasRenderingContext2D, beam: Beam) {
+            ctx.save()
+            ctx.translate(beam.x, beam.y)
+            ctx.rotate((beam.angle * Math.PI) / 180)
+
+            // Calculate pulsing opacity
+            const pulsingOpacity = beam.opacity * (0.8 + Math.sin(beam.pulse) * 0.2) * opacityMap[intensity]
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, beam.length)
+
+            // Enhanced gradient with multiple color stops
+            gradient.addColorStop(0, `hsla(${beam.hue}, 85%, 65%, 0)`)
+            gradient.addColorStop(0.1, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`)
+            gradient.addColorStop(0.4, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`)
+            gradient.addColorStop(0.6, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`)
+            gradient.addColorStop(0.9, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`)
+            gradient.addColorStop(1, `hsla(${beam.hue}, 85%, 65%, 0)`)
+
+            ctx.fillStyle = gradient
+            ctx.fillRect(-beam.width / 2, 0, beam.width, beam.length)
+            ctx.restore()
+        }
+
+        function animate() {
+            if (!canvas || !ctx) return
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.filter = "blur(35px)"
+
+            const totalBeams = beamsRef.current.length
+            beamsRef.current.forEach((beam, index) => {
+                beam.y -= beam.speed
+                beam.pulse += beam.pulseSpeed
+
+                // Reset beam when it goes off screen
+                if (beam.y + beam.length < -100) {
+                    resetBeam(beam, index, totalBeams)
+                }
+
+                drawBeam(ctx, beam)
+            })
+
+            animationFrameRef.current = requestAnimationFrame(animate)
+        }
+
+        animate()
+
+        return () => {
+            window.removeEventListener("resize", updateCanvasSize)
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current)
+            }
+        }
+    }, [intensity])
+
+    return (
+        <div className={cn("relative min-h-screen w-full overflow-hidden bg-neutral-950", className)}>
+            <canvas ref={canvasRef} className="absolute inset-0" style={{ filter: "blur(15px)" }} />
+            <div
+                className="absolute inset-0 pointer-events-none"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+
+            <motion.div
+                className="absolute inset-0 bg-neutral-950/5"
+                animate={{
+                    opacity: [0.05, 0.15, 0.05],
+                }}
+                transition={{
+                    duration: 10,
+                    ease: "easeInOut",
+                    repeat: Number.POSITIVE_INFINITY,
+                }}
+                style={{
+                    backdropFilter: "blur(50px)",
+                }}
+            />
+
+            <div className="relative z-10 flex flex-col w-full">
+                <div className="h-screen w-full flex items-center justify-center">
+                    <div className="flex flex-col items-center justify-center gap-6 px-4 text-center">
+                        <motion.h1
+                            className="text-6xl md:text-7xl lg:text-8xl font-semibold text-white tracking-tighter"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            enklave.xyz
+                        </motion.h1>
+                        <motion.p
+                            className="text-lg md:text-2xl lg:text-3xl text-white/70 tracking-tighter"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.1 }}
+                        >
+                            the platform for creator economies
+                        </motion.p>
+                        <motion.p
+                            className="text-lg md:text-2xl lg:text-3xl text-white/70 tracking-tighter"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, delay: 0.1 }}
+                        >
+                            <Link
+                                href=""
+                            >
+                                <Button
+                                    variant="secondary"
+                                    className="cursor-pointer"
+                                >
+                                    Get Started
+                                </Button>
+                            </Link>
+                        </motion.p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    )
 }
