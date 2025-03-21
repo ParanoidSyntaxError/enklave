@@ -195,7 +195,7 @@ export default function LandingPage({ className, intensity = "strong" }: Animate
                             transition={{ duration: 0.4, delay: 0.1 }}
                         >
                             <Link
-                                href=""
+                                href="/discover"
                             >
                                 <Button
                                     variant="secondary"
