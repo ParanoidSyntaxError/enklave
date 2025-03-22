@@ -2,16 +2,20 @@
 pragma solidity ^0.8.28;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 import {IEKTime} from "../time/IEKTime.sol";
 import {IEKSubscription} from "./IEKSubscription.sol";
 
-contract EKSubscription is IEKSubscription {
-    address public immutable time;
+contract EKSubscription is Initializable, IEKSubscription {
+    address public time;
 
-    uint256 public immutable amount;
+    uint256 public amount;
 
-    constructor(address timeToken, uint256 renewAmount) {
+    function initialize(
+        address timeToken,
+        uint256 renewAmount
+    ) external override initializer {
         time = timeToken;
         amount = renewAmount;
     }
