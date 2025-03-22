@@ -1,0 +1,26 @@
+specVersion: 1.2.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: EKPostFactory
+    network: base-sepolia
+    source:
+      address: "0x161723e8bc9cef9763384ce1468b8f89e90d914c"
+      abi: EKPostFactory
+      startBlock: 23444807
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - EKPostCreated
+      abis:
+        - name: EKPostFactory
+          file: ./abis/EKPostFactory.json
+      eventHandlers:
+        - event: EKPostCreated(indexed address)
+          handler: handleEKPostCreated
+      file: ./src/ek-post-factory.ts

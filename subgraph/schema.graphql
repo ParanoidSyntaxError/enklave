@@ -1,0 +1,7 @@
+type EKPostCreated @entity(immutable: true) {
+  id: Bytes!
+  post: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
