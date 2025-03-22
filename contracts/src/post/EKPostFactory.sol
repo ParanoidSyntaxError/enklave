@@ -7,23 +7,26 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
-import {ekPost} from "./ekPost.sol";
+import {IEKPostFactory} from "./IEKPostFactory.sol";
+import {EKPost, IEKPost} from "./EKPost.sol";
 
-contract ekPostFactory {
+contract EKPostFactory is IEKPostFactory {
     address public immutable implementation;
 
     constructor() {
-        implementation = address(new ekPost());
+        implementation = address(new EKPost());
     }
 
     function create(
         address owner,
         string memory name,
         string memory symbol
-    ) external returns (address) {
+    ) external override returns (address) {
         address post = Clones.clone(implementation);
-        ekPost(post).initialize(owner, name, symbol);
-        
+        IEKPost(post).initialize(owner, name, symbol);
+
+        emit EKPostCreated(post);
+
         return post;
     }
 }

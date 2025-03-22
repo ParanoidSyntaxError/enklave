@@ -5,8 +5,11 @@ import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC721URIStorage} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
 
-contract ekPost is ERC721, ERC721URIStorage, Ownable, Initializable {
+import {IEKPost} from "./IEKPost.sol";
+
+contract EKPost is ERC721, ERC721URIStorage, Ownable, Initializable, IEKPost {
     uint256 private _nextTokenId;
 
     string private _name;
@@ -18,7 +21,7 @@ contract ekPost is ERC721, ERC721URIStorage, Ownable, Initializable {
         address initOwner,
         string memory initName,
         string memory initSymbol
-    ) external initializer {
+    ) external override initializer {
         _transferOwnership(initOwner);
 
         _name = initName;
@@ -28,9 +31,9 @@ contract ekPost is ERC721, ERC721URIStorage, Ownable, Initializable {
     function safeMint(
         address to,
         string memory uri
-    ) public onlyOwner returns (uint256) {
+    ) external override onlyOwner returns (uint256) {
         uint256 tokenId = _nextTokenId++;
-        
+
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
 
@@ -53,7 +56,7 @@ contract ekPost is ERC721, ERC721URIStorage, Ownable, Initializable {
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view override(ERC721, ERC721URIStorage) returns (bool) {
+    ) public view override(ERC721, ERC721URIStorage, IERC165) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
