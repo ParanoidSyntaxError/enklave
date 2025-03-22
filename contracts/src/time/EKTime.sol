@@ -121,6 +121,13 @@ contract EKTime is ERC20, Initializable, IEKTime {
     }
 
     function _update(address from, address to, uint256 value) internal override {
+        if(from != address(0)) {
+            super._update(from, address(0), super.balanceOf(from) - balanceOf(from));
+        }
+        if(to != address(0)) {
+            super._update(to, address(0), super.balanceOf(to) - balanceOf(to));
+        }
+
         super._update(from, to, value);
 
         _decayTimestamps[to] = block.timestamp;

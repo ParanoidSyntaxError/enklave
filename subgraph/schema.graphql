@@ -1,7 +1,17 @@
-type EKPostCreated @entity(immutable: true) {
-  id: Bytes!
-  post: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+type PostContract @entity(immutable: true) {
+	id: Bytes!
+	address: Bytes!
+}
+
+type TimeContract @entity(immutable: true) {
+	id: Bytes!
+	address: Bytes!
+}
+
+type TimeAccount @entity {
+	id: Bytes!
+	time: TimeContract!
+	address: Bytes!
+	decayTimestamp: BigInt!
+	balance: BigInt!
 }

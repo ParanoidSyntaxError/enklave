@@ -1,8 +1,12 @@
 {
   "base-sepolia": {
     "EKPostFactory": {
-      "address": "0x161723e8bc9cef9763384ce1468b8f89e90d914c",
-      "startBlock": 23444807
+      "address": "0x9a1420d31921e744ea0d85c387754cb2f716fdaa",
+      "startBlock": 23447116
+    },
+    "EKTimeFactory": {
+      "address": "0xf3093b7b0eea4e7be8f4dc6c56ec0c1c5c25fa62",
+      "startBlock": 23447116
     }
   }
 }
