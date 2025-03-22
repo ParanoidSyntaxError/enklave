@@ -7,13 +7,14 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
-import {ekTime} from "./ekTime.sol";
+import {EKTime, IEKTime} from "./EKTime.sol";
+import {IEKTimeFactory} from "./IEKTimeFactory.sol";
 
-contract ekTimeFactory {
+contract EKTimeFactory is IEKTimeFactory {
     address public immutable implementation;
 
     constructor() {
-        implementation = address(new ekTime());
+        implementation = address(new EKTime());
     }
 
     function create(
@@ -21,9 +22,11 @@ contract ekTimeFactory {
         string memory symbol,
         address[] memory beforeMintHooks,
         address[] memory afterMintHooks
-    ) external returns (address) {
+    ) external override returns (address) {
         address time = Clones.clone(implementation);
-        ekTime(time).initialize(name, symbol, beforeMintHooks, afterMintHooks);
+        IEKTime(time).initialize(name, symbol, beforeMintHooks, afterMintHooks);
+
+        emit EKTimeCreated(time);
 
         return time;
     }

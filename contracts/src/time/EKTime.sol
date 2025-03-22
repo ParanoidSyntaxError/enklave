@@ -4,9 +4,10 @@ pragma solidity ^0.8.28;
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
+import {IEKTime} from "./IEKTime.sol";
 import {IEKTimeHook} from "./IEKTimeHook.sol";
 
-contract ekTime is ERC20, Initializable {
+contract EKTime is ERC20, Initializable, IEKTime {
     string private _name;
     string private _symbol;
 
@@ -24,7 +25,7 @@ contract ekTime is ERC20, Initializable {
         string memory initSymbol,
         address[] memory initBeforeMintHooks,
         address[] memory initAfterMintHooks
-    ) external initializer {
+    ) external override initializer {
         _name = initName;
         _symbol = initSymbol;
 
@@ -60,7 +61,7 @@ contract ekTime is ERC20, Initializable {
         uint256 value,
         address receiver,
         bytes memory data
-    ) external returns (uint256) {
+    ) external override returns (uint256) {
         uint256 amount = value;
         uint256 totalHookValue = 0;
 

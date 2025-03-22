@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {IEKTimeHook} from "./IEKTimeHook.sol";
 
-contract ekTimePrice is IEKTimeHook {
+contract EKTimePrice is IEKTimeHook {
     mapping(address => uint256) private _tokenPrices;
 
     constructor(address[] memory tokens, uint256[] memory prices) {
