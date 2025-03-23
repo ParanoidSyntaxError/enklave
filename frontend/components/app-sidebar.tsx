@@ -37,11 +37,6 @@ const navigation = [
         url: "/new-project",
         icon: Folder,
     },
-    {
-        title: "New Post",
-        url: "/new-post",
-        icon: File,
-    },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

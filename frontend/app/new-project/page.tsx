@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import SidebarLayout from "@/components/sidebar-layout"
 import { ConnectedWallet, usePrivy, useWallets } from "@privy-io/react-auth"
 import * as ethers from "ethers"
-import { redirect } from "next/navigation"
+import { useRouter } from 'next/navigation'
 
 const formSchema = z.object({
     name: z
@@ -42,6 +42,8 @@ const formSchema = z.object({
 })
 
 export default function ProjectCreationForm() {
+    const router = useRouter()
+
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -118,14 +120,14 @@ export default function ProjectCreationForm() {
 
             const tx = await projectFactory.create(
                 wallet.address,
-                "name",
-                "symbol",
-                BigInt(16 * (10 ** 16))
+                values.name,
+                values.tokenSymbol,
+                BigInt(Number(values.subscriptionPrice) * (10 ** 18))
             );
 
             await tx.wait();
 
-            redirect(`/discover`);
+            router.push('/discover');
         } catch (error) {
             console.error(error)
         } finally {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -11,6 +11,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import SidebarLayout from "@/components/sidebar-layout"
+import * as React from 'react'
+import { getProject, Project } from "@/lib/subgraph"
 
 const linkSchema = z.object({
     url: z.string().url({ message: "Please enter a valid URL." }),
@@ -27,7 +29,20 @@ const formSchema = z.object({
     links: z.array(linkSchema).optional().default([]),
 })
 
-export default function PostCreationForm() {
+export default function PostCreationForm({
+    params,
+}: {
+    params: any
+}) {
+    const { id }: any = React.use(params);
+    const [project, setProject] = useState<Project | undefined>(undefined);
+    useEffect(() => {
+        const tryGetProject = async () => {
+            setProject(await getProject(id));
+        };  
+        tryGetProject();
+    });
+
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -45,13 +60,15 @@ export default function PostCreationForm() {
         name: "links",
     })
 
-    const watchContent = form.watch("content")
-
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        if(!project) {
+            return;
+        }
+
         setIsSubmitting(true)
 
         try {
-
+            //project.posts
 
         } catch (error) {
             console.error(error)

@@ -21,20 +21,20 @@ export function PrivyConnect({
     const { wallets } = useWallets();
     const [wallet, setWallet] = useState<ConnectedWallet | undefined>();
     useEffect(() => {
-        const findWallet = async () => {
+        const tryGetWallet = async () => {
             for (let i = 0; i < wallets.length; i++) {
-                if(wallets[i].connectorType === "injected") {
+                if (wallets[i].connectorType === "injected") {
                     const isConnected = await wallets[i].isConnected();
-                    if(isConnected) {
+                    if (isConnected) {
                         setWallet(wallets[i]);
                         return;
                     }
                 }
             }
-        };  
-
-        findWallet();
-    });
+        };
+        tryGetWallet();
+        console.log(wallets)
+    }, [wallets]);
 
     if (!ready) {
         return (
@@ -72,8 +72,10 @@ export function PrivyConnect({
                     (You)
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <LogOut/>
+                <DropdownMenuItem
+                    onClick={connectWallet}
+                >
+                    <LogOut />
                     <span>Logout</span>
                 </DropdownMenuItem>
             </DropdownMenuContent>

@@ -6,7 +6,7 @@ import { EKPost } from "../generated/templates/EKPostTemplate/EKPost";
 export function handleEKPostCreated(event: EKPostCreated): void {
 	EKPostTemplate.create(event.params.post);
 
-	let postContract = new PostContract(event.params.post);
+	let postContract = new PostContract(event.transaction.hash);
 	postContract.address = event.params.post;
 
 	let ekPost = EKPost.bind(event.params.post);
