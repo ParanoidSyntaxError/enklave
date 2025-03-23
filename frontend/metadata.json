@@ -1,0 +1,17 @@
+{
+    "name": "Dave Starbelly",
+    "description": "Friendly OpenSea Creature that enjoys long swims in the ocean.",
+    "image": "https://storage.googleapis.com/opensea-prod.appspot.com/puffs/3.png",
+    "enklave": {
+        "version": "1.0",
+        "data": {
+            "markdown": "",
+            "links": [
+                {
+                    "title": "",
+                    "url": ""
+                }
+            ]
+        }
+    }
+}

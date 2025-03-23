@@ -20,10 +20,11 @@ dataSources:
       abis:
         - name: EKPostFactory
           file: ./abis/EKPostFactory.json
+        - name: EKPost
+          file: ./abis/EKPost.json
       eventHandlers:
         - event: EKPostCreated(indexed address)
           handler: handleEKPostCreated
-        - event: 
       file: ./src/ek-post-factory.ts
   - kind: ethereum
     name: EKTimeFactory
@@ -64,3 +65,21 @@ templates:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/ek-time.ts      
+  - kind: ethereum/contract
+    name: EKPostTemplate
+    network: base-sepolia
+    source:
+      abi: EKPost
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Post
+      abis:
+        - name: EKPost
+          file: ./abis/EKPost.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/ek-post.ts      

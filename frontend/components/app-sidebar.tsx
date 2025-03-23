@@ -3,7 +3,9 @@
 import * as React from "react"
 import {
     BookOpen,
+    File,
     FilePlus,
+    Folder,
     Telescope
 } from "lucide-react"
 import {
@@ -33,7 +35,12 @@ const navigation = [
     {
         title: "New Project",
         url: "/new-project",
-        icon: FilePlus,
+        icon: Folder,
+    },
+    {
+        title: "New Post",
+        url: "/new-post",
+        icon: File,
     },
 ];
 

@@ -58,15 +58,15 @@ export default function ProjectCreationForm() {
     useEffect(() => {
         const findWallet = async () => {
             for (let i = 0; i < wallets.length; i++) {
-                if(wallets[i].connectorType === "injected") {
+                if (wallets[i].connectorType === "injected") {
                     const isConnected = await wallets[i].isConnected();
-                    if(isConnected) {
+                    if (isConnected) {
                         setWallet(wallets[i]);
                         return;
                     }
                 }
             }
-        };  
+        };
 
         findWallet();
     });
@@ -136,7 +136,7 @@ export default function ProjectCreationForm() {
     return (
         <SidebarLayout>
             <div
-                className="max-w-[32rem] mt-18"
+                className="max-w-[32rem] mt-18 mb-8"
             >
                 <div
                     className="text-center text-2xl mb-8"
