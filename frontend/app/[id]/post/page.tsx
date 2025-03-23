@@ -13,6 +13,10 @@ import { Textarea } from "@/components/ui/textarea"
 import SidebarLayout from "@/components/sidebar-layout"
 import * as React from 'react'
 import { getProject, Project } from "@/lib/subgraph"
+import { ConnectedWallet, useWallets } from "@privy-io/react-auth"
+import * as ethers from "ethers"
+import { useRouter } from 'next/navigation'
+import { pinata } from "@/lib/pinata-config"
 
 const linkSchema = z.object({
     url: z.string().url({ message: "Please enter a valid URL." }),
@@ -34,14 +38,36 @@ export default function PostCreationForm({
 }: {
     params: any
 }) {
+    const router = useRouter()
+
     const { id }: any = React.use(params);
     const [project, setProject] = useState<Project | undefined>(undefined);
     useEffect(() => {
         const tryGetProject = async () => {
             setProject(await getProject(id));
-        };  
-        tryGetProject();
-    });
+        };
+        if (project === undefined) {
+            tryGetProject();
+        }
+    }, [id]);
+
+    const { wallets } = useWallets();
+    const [wallet, setWallet] = useState<ConnectedWallet | undefined>();
+    useEffect(() => {
+        const findWallet = async () => {
+            for (let i = 0; i < wallets.length; i++) {
+                if (wallets[i].connectorType === "injected") {
+                    const isConnected = await wallets[i].isConnected();
+                    if (isConnected) {
+                        setWallet(wallets[i]);
+                        return;
+                    }
+                }
+            }
+        };
+
+        findWallet();
+    }, [wallets]);
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -61,15 +87,70 @@ export default function PostCreationForm({
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        if(!project) {
+        if (!project || !wallet) {
             return;
         }
 
         setIsSubmitting(true)
 
         try {
-            //project.posts
+            let uriPin;
+            try {
+                const uriJson = {
+                    markdown: values.content,
+                    links: values.links
+                };
+                const uriKeyRequest = await fetch("/api/key");
+                const uriKeyData = await uriKeyRequest.json();
+                uriPin = await pinata.upload.public.json(uriJson).key(uriKeyData.JWT);
+            } catch (error) {
+                console.error(error);
+            }
+            if(!uriPin) {
+                return;
+            }
 
+            // TODO: Encrypt with TEE
+
+            const encryptedIpfsHash = "";
+
+            const provider = await wallet.getEthereumProvider();
+            const ethersProvider = new ethers.BrowserProvider(provider);
+            const signer = await ethersProvider.getSigner();
+
+            const posts = new ethers.Contract(
+                project.posts,
+                [{
+                    "type": "function",
+                    "name": "safeMint",
+                    "inputs": [
+                        { "name": "to", "type": "address", "internalType": "address" },
+                        { "name": "uri", "type": "string", "internalType": "string" }
+                    ],
+                    "outputs": [
+                        { "name": "", "type": "uint256", "internalType": "uint256" }
+                    ],
+                    "stateMutability": "nonpayable"
+                }],
+                signer
+            );
+
+            const tx = await posts.safeMint(
+                wallet.address,
+                "data:application/json;base64," + ethers.encodeBase64(JSON.stringify({
+                    "name": values.title,
+                    "description": values.description,
+                    "image": "https://storage.googleapis.com/opensea-prod.appspot.com/puffs/2.png",
+                    "enklave": {
+                        "version": "1.0",
+                        "data": encryptedIpfsHash
+                    }
+                }))
+            );
+
+            await tx.wait();
+
+            router.push(`/${project.id}`);
         } catch (error) {
             console.error(error)
         } finally {

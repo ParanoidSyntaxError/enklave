@@ -98,17 +98,18 @@ export default function ProjectPage({
                 </div>
                 {wallet?.address && ethers.getAddress(wallet.address) === ethers.getAddress(project.owner) &&
                     <div>
-                        <Button
-                            className="w-full"
+                        <Link
+                            href={`/${project.id}/post`}
+                            className="cursor-pointer"
                         >
-                            <Link
-                                href={`/${project.id}/post`}
-                                className="flex flex-row items-center space-x-2"
+                            <Button
+                                className="w-full cursor-pointer"
+                                variant="outline"
                             >
                                 <Plus />
                                 <span>New Post</span>
-                            </Link>
-                        </Button>
+                            </Button>
+                        </Link>
                     </div>
                 }
             </div>

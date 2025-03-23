@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import SidebarLayout from "@/components/sidebar-layout"
-import { ConnectedWallet, usePrivy, useWallets } from "@privy-io/react-auth"
+import { ConnectedWallet, useWallets } from "@privy-io/react-auth"
 import * as ethers from "ethers"
 import { useRouter } from 'next/navigation'
 
@@ -71,7 +71,7 @@ export default function ProjectCreationForm() {
         };
 
         findWallet();
-    });
+    }, [wallets]);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (!wallet) {
