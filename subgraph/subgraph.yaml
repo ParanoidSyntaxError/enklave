@@ -23,6 +23,7 @@ dataSources:
       eventHandlers:
         - event: EKPostCreated(indexed address)
           handler: handleEKPostCreated
+        - event: 
       file: ./src/ek-post-factory.ts
   - kind: ethereum
     name: EKTimeFactory

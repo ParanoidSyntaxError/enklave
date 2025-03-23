@@ -1,6 +1,13 @@
-type PostContract @entity(immutable: true) {
+type PostContract @entity {
 	id: Bytes!
 	address: Bytes!
+	owner: Bytes!
+}
+
+type Post @entity(immutable: true) {
+	id: Bytes!
+	tokenId: BigInt!
+	uri: String!
 }
 
 type TimeContract @entity(immutable: true) {

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Space_Mono } from 'next/font/google';
+import { ThemeProvider } from "@/components/theme-provider";
+import PrivyWrapper from "@/components/privy-wrapper";
 
 const font = Space_Mono({
 	subsets: ["latin"],
@@ -22,7 +24,18 @@ export default function RootLayout({
 			<body
 				className={`${font.className} antialiased`}
 			>
-				{children}
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					<PrivyWrapper>
+						<main>
+							{children}
+						</main>
+					</PrivyWrapper>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

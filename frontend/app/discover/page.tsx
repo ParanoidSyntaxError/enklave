@@ -1,9 +1,11 @@
+import SidebarLayout from "@/components/sidebar-layout";
 
 export default function DiscoverPage() {
-
     return (
-        <div>
-
-        </div>
+        <SidebarLayout>
+            <div>
+                
+            </div>
+        </SidebarLayout>
     )
 }
